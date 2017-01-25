@@ -1,0 +1,24 @@
+imax 1 number of channels
+jmax * number of backgrounds
+kmax * number of systematic uncertainty sources
+----------
+shapes signal     Vg w_signal_780.root           Vg:signal_fixed_antibtag
+shapes background Vg backgroundRootFile          Vg:backgroundPdf
+shapes data_obs   Vg w_data_antibtag.root        Vg:data_obs
+----------
+## Observation
+bin                     Vg
+observation             -1
+----------
+bin                   Vg          Vg
+process               signal      background
+process               0           1
+rate                  2.94084 1
+cms_lumi_13TeV  lnN   1.027       -     
+cms_btag_sf_13TeV       lnN              .851         -
+cms_JES_13TeV           lnN              1.02        -         
+cms_phoHLT_13TeV        lnN              1.02        -         
+cms_pho_sf_13TeV        lnN              1.05        -         
+cms_pileup_13TeV        lnN              1.01        -         
+cms_xzg_pdf_13TeV       lnN              1.02        -         
+cms_xzg_scale_13TeV     lnN              1.05        -        

@@ -1,0 +1,5 @@
+*.pyc
+*.root
+*.pdf
+forcelink.py
+condor/*
