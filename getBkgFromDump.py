@@ -21,30 +21,82 @@ def getPdfFromDump(category, inWorkspace, pdfName, makePlot, rooHistData, outSuf
   for lib in extLibs:
     gSystem.Load(lib)
   rooWS = RooWorkspace("Vg")
-  inWorkspace.Print()
+  #inWorkspace.Print()
   print "going to try to get pdf with name %s from this workspace" % pdfName
   pdfFromDump = inWorkspace.pdf(pdfName)
   origName = pdfName
   print " --->origName: %s" % origName 
   #pdfFromDump.SetName("bg_%s" % category)
   
-  nBackground=RooRealVar("bg_%s_norm" % category, "nbkg", rooHistData.sumEntries())
+  nBackground=RooRealVar("%s_norm" % origName, "nbkg", rooHistData.sumEntries())
   
-  getattr(rooWS, 'import')(pdfFromDump, RooCmdArg())
-  getattr(rooWS, 'import')(rooHistData, RooCmdArg())
-  getattr(rooWS, 'import')(nBackground, RooCmdArg())
   
   varset   = pdfFromDump.getVariables()
   varIt    = varset.iterator()
   paramVar = varIt.Next()
-  #while paramVar:
-  #  if paramVar.GetName() != var.GetName(): # don't remove the range from the "x" variable
-  #    print "about to remove range from parameter with name %s" % paramVar.GetName()
-  #    rooWS.var(paramVar.GetName()).removeRange()
-  #    print "removed range from pdf with name %s" % (paramVar.GetName())
-  #  paramVar = varIt.Next()
+  var = inWorkspace.var("x")
+
+  while paramVar:
+    print "looking at paramVar %s" % paramVar.GetName()
+    if paramVar.GetName() != var.GetName(): # don't remove the range from the "x" variable
+      inWorkspace.var(paramVar.GetName()).removeRange()
+      print "removed range from pdf %s with name %s" % (pdfName, paramVar.GetName())
+      print "parameter with name %s had initial value %f" % (paramVar.GetName(), paramVar.getValV())
+    paramVar = varIt.Next()
+    
   
-  result = pdfFromDump.fitTo(rooHistData, RooFit.Minimizer("Minuit2", "minimize"), RooFit.Range(700, 4700), RooFit.Strategy(2), RooFit.SumW2Error(kTRUE), RooFit.Save(1), RooFit.Offset(kTRUE))
+  #result = pdfFromDump.fitTo(rooHistData, RooFit.Minimizer("Minuit2", "minimize"), RooFit.Range(700, 4700), RooFit.Strategy(2), RooFit.SumW2Error(kTRUE), RooFit.Save(1), RooFit.Offset(kTRUE))
+  #result = pdfFromDump.fitTo(rooHistData, RooFit.Minimizer("Minuit2"),RooFit.SumW2Error(kTRUE), RooFit.Strategy(2), RooFit.Hesse(0), RooFit.Save(kTRUE) )
+  #result = pdfFromDump.fitTo(rooHistData, RooFit.Minimizer("Minuit2"),RooFit.SumW2Error(kTRUE), RooFit.Save())
+  
+  status = 1
+  result = RooFitResult()
+  nll = RooNLLVar("nll", "nll", pdfFromDump, rooHistData)
+  minuit = RooMinimizer(nll)
+  minuit.setOffsetting(kTRUE)
+  minuit.setStrategy(2)
+  minuit.minimize("Minuit2", "minimize")
+  nTries = 0
+  def doFit(refs):
+    maxTries = 10+refs["tries"]
+    while stat != 0 :
+      refs["fitTest"] =  refs["minimizer"].save("fitTest", "fitTest")
+      offset = refs["negLogLikelihood"].offset()
+      minnll_woffset = refs["fitTest"].minNll()
+      minnll = -offset-minnll_woffset
+      refs["stat"] = refs["fitTest"].status()
+      print "try %i:\n status: %i  minnll_woffset: %f, minnll: %f, offset: %f" % (refs["fitTest"].status(), refs["tries"], minnll_woffset, minnll, offset)
+      refs["tries"] += 1
+      if refs["tries"] == maxTries or refs["stat"] == 0:
+        break
+  references = {}
+  references["negLogLikelihood"]   = nll
+  references["fitTest"]           = result
+  references["stat"]              = int(status)
+  references["minimizer"]         = minuit
+  references["tries"]             = int(nTries)
+  doFit(references)
+  print "after %i tries, fit status was %i" % (references["tries"], references["stat"])
+  if references["stat"] == 0:
+    print "attempting to reset varIt"
+    varIt.Reset()
+    paramVar = varIt.Next()
+    while paramVar:
+      print "looking at paramVar %s" % paramVar.GetName()
+      if paramVar.GetName() != var.GetName(): # don't remove the range from the "x" variable
+        print "parameter with name %s had final value %f" % (paramVar.GetName(), paramVar.getValV())
+        paramVar.setConstant(kTRUE)
+      paramVar = varIt.Next()
+      
+  else:
+    if nTries < 100:
+      references["fitTest"].randomizePars()
+    else:
+      print "fit failed after %i tries"  % nTries
+      exit(0)
+    
+  
+  
   var = inWorkspace.var("x")
   frame = var.frame()
 
@@ -55,6 +107,9 @@ def getPdfFromDump(category, inWorkspace, pdfName, makePlot, rooHistData, outSuf
   frame.Draw()
   if makePlot:
     can.Print("fitFromFtest_%s_%s_%s.pdf" % (category, origName, outSuffix))
+  getattr(rooWS, 'import')(pdfFromDump, RooCmdArg())
+  getattr(rooWS, 'import')(rooHistData, RooCmdArg())
+  getattr(rooWS, 'import')(nBackground, RooCmdArg())
   return {"rooWS" : rooWS, "pdfFromDump": pdfFromDump, "origName" : origName}
 
 if __name__ == "__main__" :

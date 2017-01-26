@@ -30,6 +30,8 @@ def makeMlFitScripts(category, inWorkspace, rooDataHist, nToys, seed, outDir, re
       seed                            ,
       plotsDir
     )
+    if not path.exists(path.join(outDir, plotsDir)):
+        makedirs(path.join(outDir, plotsDir))
     pName = "cat-%s_model-%s_nToys-%i_seed-%i"%(category, modelName, nToys, seed)
     scriptName = "%s/mlfit_%s.sh" % (outDir, pName)
     jdlName =    "%s/jdl_%s.jdl" % (outDir, pName)
