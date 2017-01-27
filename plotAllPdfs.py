@@ -18,35 +18,30 @@ if options.batch:
   gROOT.SetBatch()
 
 #inFiles = [TFile("allpdfs_weighted/env_pdf_0_13TeV_atlas1_fix5_%s.root" % cat), TFile("allpdfs_weighted/env_pdf_0_13TeV_exp1_fix5_%s.root" % cat), TFile("allpdfs_weighted/env_pdf_0_13TeV_expow1_fix5_%s.root" % cat), TFile("allpdfs_weighted/env_pdf_0_13TeV_pow1_fix5_%s.root" % cat), TFile("allpdfs_weighted/env_pdf_0_13TeV_vvdijet1_fix5_%s.root" % cat)]
-inFiles = [
-  TFile('gofCondor/cat-antibtag_model-bkg_atlas1.root'),
-  #TFile('gofCondor/cat-antibtag_model-bkg_atlas2.root'),
-  #TFile('gofCondor/cat-antibtag_model-bkg_atlas3.root'),
-  #TFile('gofCondor/cat-antibtag_model-bkg_cheb1.root'),
-  #TFile('gofCondor/cat-antibtag_model-bkg_cheb2.root'),
-  #TFile('gofCondor/cat-antibtag_model-bkg_cheb3.root'),
-  #TFile('gofCondor/cat-antibtag_model-bkg_dijet2.root'),
-  #TFile('gofCondor/cat-antibtag_model-bkg_dijet3.root'),
-  TFile('gofCondor/cat-antibtag_model-bkg_dijetsimple2.root'),
-  TFile('gofCondor/cat-antibtag_model-bkg_exp1.root'),
-  #TFile('gofCondor/cat-antibtag_model-bkg_exp3.root'),
-  TFile('gofCondor/cat-antibtag_model-bkg_expow1.root'),
-  #TFile('gofCondor/cat-antibtag_model-bkg_expow2.root'),
-  #TFile('gofCondor/cat-antibtag_model-bkg_expow3.root'),
-  #TFile('gofCondor/cat-antibtag_model-bkg_lau1.root'),
-  #TFile('gofCondor/cat-antibtag_model-bkg_lau2.root'),
-  #TFile('gofCondor/cat-antibtag_model-bkg_lau3.root'),
-  TFile('gofCondor/cat-antibtag_model-bkg_pow1.root'),
-  #TFile('gofCondor/cat-antibtag_model-bkg_pow3.root'),
-  TFile('gofCondor/cat-antibtag_model-bkg_vvdijet1.root'),
-  #TFile('gofCondor/cat-antibtag_model-bkg_vvdijet2.root'),
-]
+if options.category == "btag":
+  inFiles = [
+    TFile('gofCondor/cat-btag_model-bkg_atlas1.root'),
+    TFile('gofCondor/cat-btag_model-bkg_dijetsimple2.root'),
+    TFile('gofCondor/cat-btag_model-bkg_exp1.root'),
+    TFile('gofCondor/cat-btag_model-bkg_expow1.root'),
+    TFile('gofCondor/cat-btag_model-bkg_lau1.root'),
+    TFile('gofCondor/cat-btag_model-bkg_vvdijet2.root'),
+  ]
+else:
+  inFiles = [
+    TFile('gofCondor/cat-antibtag_model-bkg_atlas1.root'),
+    TFile('gofCondor/cat-antibtag_model-bkg_dijetsimple2.root'),
+    TFile('gofCondor/cat-antibtag_model-bkg_exp1.root'),
+    TFile('gofCondor/cat-antibtag_model-bkg_expow1.root'),
+    TFile('gofCondor/cat-antibtag_model-bkg_lau1.root'),
+    TFile('gofCondor/cat-antibtag_model-bkg_vvdijet1.root'),
+  ]
 gSystem.Load("libdiphotonsUtils")
 gSystem.Load("libHiggsAnalysisCombinedLimit")
 
 pdfs={}
 for inFile in inFiles:
-  pdfs[inFile.GetName()] = inFile.Get("Vg").pdf(inFile.GetName().replace("gofCondor/cat-antibtag_model-","").replace(".root",""))
+  pdfs[inFile.GetName()] = inFile.Get("Vg").pdf(inFile.GetName().replace("gofCondor/cat-%s_model-" % options.category,"").replace(".root",""))
   pdfs[inFile.GetName()].Print()
 
 print pdfs
