@@ -88,6 +88,7 @@ def getPdfFromDump(category, inWorkspace, pdfName, makePlot, rooHistData, outSuf
   else:
     if nTries < 100:
       references["fitTest"].randomizePars() # try to get out of the danga zone
+      # doFit(references) -- test with this added
     else:
       print "fit failed after %i tries"  % nTries
       exit(0)
