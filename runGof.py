@@ -6,6 +6,11 @@ import shlex
 from modelNames import getModelNames
 from condorFactory import *
 
+####
+# prepares a bunch of scripts and jdl files
+# for running goodness-of-fit tests
+# John Hakala 1/27/2017
+####
 
 def getDcardName(category, modelName, outDir):
   return "%s/datacard_%s_%s.txt" % (outDir, category, modelName)

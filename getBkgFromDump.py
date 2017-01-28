@@ -3,11 +3,11 @@ from forcelink import force_symlink
 from ROOT import *
 
 ####
-# Script for getting a background prediction pdf from the results of the fTest
-# It has an interactive mode where you can look at the pdfs in the multipdf
+# Script for getting a background prediction pdf from the the dump made by dumpBkgPdfs
+# It has an interactive mode where you can look at the pdfs in the dump
 # as well as a mode where you can pick one without seeing the prompt.
 # For help on the command line options, do
-# python getBkgFromFtest.py --help
+# python getBkgFromDump.py --help
 #
 # John Hakala 12/28/2016
 ####
@@ -21,12 +21,9 @@ def getPdfFromDump(category, inWorkspace, pdfName, makePlot, rooHistData, outSuf
   for lib in extLibs:
     gSystem.Load(lib)
   rooWS = RooWorkspace("Vg")
-  #inWorkspace.Print()
   print "going to try to get pdf with name %s from this workspace" % pdfName
   pdfFromDump = inWorkspace.pdf(pdfName)
   origName = pdfName
-  print " --->origName: %s" % origName 
-  #pdfFromDump.SetName("bg_%s" % category)
   
   nBackground=RooRealVar("%s_norm" % origName, "nbkg", rooHistData.sumEntries())
   
@@ -44,7 +41,7 @@ def getPdfFromDump(category, inWorkspace, pdfName, makePlot, rooHistData, outSuf
       print "parameter with name %s had initial value %f" % (paramVar.GetName(), paramVar.getValV())
     paramVar = varIt.Next()
     
-  
+  # it seems fitTo is recommended against... ?
   #result = pdfFromDump.fitTo(rooHistData, RooFit.Minimizer("Minuit2", "minimize"), RooFit.Range(700, 4700), RooFit.Strategy(2), RooFit.SumW2Error(kTRUE), RooFit.Save(1), RooFit.Offset(kTRUE))
   #result = pdfFromDump.fitTo(rooHistData, RooFit.Minimizer("Minuit2"),RooFit.SumW2Error(kTRUE), RooFit.Strategy(2), RooFit.Hesse(0), RooFit.Save(kTRUE) )
   #result = pdfFromDump.fitTo(rooHistData, RooFit.Minimizer("Minuit2"),RooFit.SumW2Error(kTRUE), RooFit.Save())
@@ -83,14 +80,14 @@ def getPdfFromDump(category, inWorkspace, pdfName, makePlot, rooHistData, outSuf
     paramVar = varIt.Next()
     while paramVar:
       print "looking at paramVar %s" % paramVar.GetName()
-      if paramVar.GetName() != var.GetName(): # don't remove the range from the "x" variable
+      if paramVar.GetName() != var.GetName(): # only print the actual shape variables
         print "parameter with name %s had final value %f" % (paramVar.GetName(), paramVar.getValV())
         paramVar.setConstant(kTRUE)
       paramVar = varIt.Next()
       
   else:
     if nTries < 100:
-      references["fitTest"].randomizePars()
+      references["fitTest"].randomizePars() # try to get out of the danga zone
     else:
       print "fit failed after %i tries"  % nTries
       exit(0)
@@ -115,8 +112,6 @@ def getPdfFromDump(category, inWorkspace, pdfName, makePlot, rooHistData, outSuf
 if __name__ == "__main__" :
 
   parser = OptionParser()
-  #parser.add_option("-i", "--inFtest", dest="inFtest", 
-  #                  help = "the input mlfit rootfile")
   parser.add_option("-c", "--category"  , dest="category",
                     help = "either 'btag' or 'antibtag'"                                         )
   parser.add_option("-n", "--pdfIndex"   , dest="pdfIndex",

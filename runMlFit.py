@@ -5,6 +5,12 @@ from condorFactory import *
 from getBkgFromDump import getPdfFromDump
 from runGof import getDcardName, checkForDatacard, makeOneDatacard, makeDatacards
 
+###
+# Prepares a bunch of scripts and jdl files
+# for running MaxLikelihoodFits in condor
+# John Hakala, 1/27/2017
+###
+
 def makeMlFitScripts(category, inWorkspace, rooDataHist, nToys, seed, outDir, remakeDatacards):
   print "nToys is %i" % nToys
   print "seed is %i" % seed
