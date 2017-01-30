@@ -26,29 +26,32 @@ def makeOneDatacard(inFile, dcardTemplate, category, modelName, outDir):
   outDcard.close()
   print "  > made datacard for model %s: %s" % (modelName, outDcard.name)
 
+def doFit(category, inFile):
+  for modelName in getModelNames():
+    bkgFileName = "cat-%s_model-%s.root" % (category, modelName)
+    dataLinkName = "w_data_%s.root" % options.category
+    dataFile = TFile(dataLinkName)
+    dataWS   = dataFile.Get("Vg")
+    dataRooHist  = dataWS.data("data_obs")
+
+    inTfile = TFile(inFile)
+    dump = inTfile.Get("Vg")
+    bkgPdfDict = getPdfFromDump(category, dump, modelName, False, dataRooHist, "gof", True) 
+
+    outBkgFile = TFile("%s/%s" % (outDir, bkgFileName), "RECREATE")
+    bkgPdfDict["rooWS"].Write()
+    outBkgFile.Close()
+
 def makeDatacards(category, inFile, outDir, fit):
   print "Will make datacards for all models specified in modelNames.py"
   if not path.exists(outDir):
       makedirs(outDir)
   dcardTemplate = open("datacard_template_%s.txt" % category, "r")
 
-  for modelName in getModelNames():
-    bkgFileName = "cat-%s_model-%s.root" % (category, modelName)
-    if fit:
-      dataLinkName = "w_data_%s.root" % options.category
-      dataFile = TFile(dataLinkName)
-      dataWS   = dataFile.Get("Vg")
-      dataRooHist  = dataWS.data("data_obs")
+  if fit:
+    doFit(category, inFile)
 
-      inTfile = TFile(inFile)
-      dump = inTfile.Get("Vg")
-      bkgPdfDict = getPdfFromDump(category, dump, modelName, False, dataRooHist, "gof", True) 
-
-      outBkgFile = TFile("%s/%s" % (outDir, bkgFileName), "RECREATE")
-      bkgPdfDict["rooWS"].Write()
-      outBkgFile.Close()
-
-    makeOneDatacard(bkgFileName, dcardTemplate, category, modelName, outDir)
+  makeOneDatacard(bkgFileName, dcardTemplate, category, modelName, outDir)
 
 def checkForDatacard(outDir, dcardName):
   txtFiles = glob("%s/*.txt" % outDir)
@@ -110,8 +113,15 @@ if __name__ == "__main__":
       print "error: -s or --seed was specified, but not running GOF test."
       exit(1)
     elif not options.makeDatacards:
-      print "neither making datacards nor running GOF test... which means this does nothing."
-      exit(2)
+      if not options.fit:
+        print "neither making datacards nor running GOF test, nor fitting... which means this does nothing."
+        exit(2)
+      elif options.fit:
+        print "just doing background fits."
+      else:
+        print "error: something is funny with the options requested:"
+        print options
+        exit(2)
   else:
     if options.nToys is None:
       options.nToys = 25
@@ -122,6 +132,8 @@ if __name__ == "__main__":
   from getBkgFromDump import getPdfFromDump
   if options.makeDatacards:
     makeDatacards(options.category, options.inFile, outDir, options.fit)
+  elif options.fit:
+    doFit(options.category, options.inFile)
   
   if options.doGOFtest is None:
     print "Done making datacards. Will not perform GOF test."
