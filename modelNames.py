@@ -22,3 +22,25 @@ def getModelNames():
     "bkg_vvdijet1",
     "bkg_vvdijet2"
   ]
+def getGoodModelNames(category):
+  if not category in ["btag", "antibtag"]:
+    print "error: got a bad category in getGoodModelNames: %s" % category
+    exit(1)
+  elif category == "btag":
+    return [
+      "bkg_dijetsimple2",
+      "bkg_atlas1",
+      "bkg_expow1",
+      "bkg_exp1",
+      #"bkg_lau1",
+      "bkg_vvdijet2"
+    ]
+  elif category == "antibtag":
+    return [
+      "bkg_atlas1",
+      "bkg_dijetsimple2",
+      "bkg_exp1",
+      "bkg_expow1",
+      #"bkg_lau1",
+      "bkg_vvdijet1"
+    ]

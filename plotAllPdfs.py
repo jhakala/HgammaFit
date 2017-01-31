@@ -1,4 +1,5 @@
 from optparse import OptionParser
+from modelNames import getGoodModelNames
 
 parser = OptionParser()
 parser.add_option("-c", "--category" , dest="category" , 
@@ -20,24 +21,10 @@ if options.batch:
   gROOT.SetBatch()
 RooMsgService.instance().setGlobalKillBelow(RooFit.WARNING) ;
 #inFiles = [TFile("allpdfs_weighted/env_pdf_0_13TeV_atlas1_fix5_%s.root" % cat), TFile("allpdfs_weighted/env_pdf_0_13TeV_exp1_fix5_%s.root" % cat), TFile("allpdfs_weighted/env_pdf_0_13TeV_expow1_fix5_%s.root" % cat), TFile("allpdfs_weighted/env_pdf_0_13TeV_pow1_fix5_%s.root" % cat), TFile("allpdfs_weighted/env_pdf_0_13TeV_vvdijet1_fix5_%s.root" % cat)]
-if options.category == "btag":
-  inFiles = [
-    TFile('gofCondor/cat-btag_model-bkg_atlas1.root'),
-    TFile('gofCondor/cat-btag_model-bkg_dijetsimple2.root'),
-    TFile('gofCondor/cat-btag_model-bkg_exp1.root'),
-    TFile('gofCondor/cat-btag_model-bkg_expow1.root'),
-    TFile('gofCondor/cat-btag_model-bkg_lau1.root'),
-    TFile('gofCondor/cat-btag_model-bkg_vvdijet2.root'),
-  ]
-else:
-  inFiles = [
-    TFile('gofCondor/cat-antibtag_model-bkg_atlas1.root'),
-    TFile('gofCondor/cat-antibtag_model-bkg_dijetsimple2.root'),
-    TFile('gofCondor/cat-antibtag_model-bkg_exp1.root'),
-    TFile('gofCondor/cat-antibtag_model-bkg_expow1.root'),
-    TFile('gofCondor/cat-antibtag_model-bkg_lau1.root'),
-    TFile('gofCondor/cat-antibtag_model-bkg_vvdijet1.root'),
-  ]
+inFiles = []
+for modelName in getGoodModelNames(options.category):
+  inFiles.append(TFile('gofCondor/cat-btag_model-%s.root'i % modelName))
+
 gSystem.Load("libdiphotonsUtils")
 gSystem.Load("libHiggsAnalysisCombinedLimit")
 
