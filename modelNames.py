@@ -33,7 +33,7 @@ def getGoodModelNames(category):
       "bkg_expow1",
       "bkg_exp1",
       #"bkg_lau1",
-      "bkg_vvdijet2"
+      "bkg_vvdijet1"
     ]
   elif category == "antibtag":
     return [

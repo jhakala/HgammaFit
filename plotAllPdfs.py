@@ -23,14 +23,15 @@ RooMsgService.instance().setGlobalKillBelow(RooFit.WARNING) ;
 #inFiles = [TFile("allpdfs_weighted/env_pdf_0_13TeV_atlas1_fix5_%s.root" % cat), TFile("allpdfs_weighted/env_pdf_0_13TeV_exp1_fix5_%s.root" % cat), TFile("allpdfs_weighted/env_pdf_0_13TeV_expow1_fix5_%s.root" % cat), TFile("allpdfs_weighted/env_pdf_0_13TeV_pow1_fix5_%s.root" % cat), TFile("allpdfs_weighted/env_pdf_0_13TeV_vvdijet1_fix5_%s.root" % cat)]
 inFiles = []
 for modelName in getGoodModelNames(options.category):
-  inFiles.append(TFile('gofCondor/cat-btag_model-%s.root'i % modelName))
+  inFiles.append(TFile('gof_saturated_%s/cat-%s_model-%s.root' % (options.category, options.category, modelName)))
 
 gSystem.Load("libdiphotonsUtils")
 gSystem.Load("libHiggsAnalysisCombinedLimit")
 
 pdfs={}
 for inFile in inFiles:
-  pdfs[inFile.GetName()] = inFile.Get("Vg").pdf(inFile.GetName().replace("gofCondor/cat-%s_model-" % options.category,"").replace(".root",""))
+  pdfName = inFile.GetName().replace("gof_saturated_%s/cat-%s_model-" % (options.category, options.category),"").replace(".root","")
+  pdfs[inFile.GetName()] = inFile.Get("Vg").pdf(pdfName)
   pdfs[inFile.GetName()].Print()
 
 print pdfs
@@ -65,17 +66,33 @@ for pdf in pdfs.keys():
     #function = pdfs[pdf].asTF(RooArgList(xVar))
     #chiSquareLog.write("model %s: chi^2 = %f (TF1 method)\n" % (pdfs[pdf].GetName(), frame.findObject("gData").Chisquare(function)))
   print "number of data events : %i" % data.sumEntries()
-  for iPt in range(0, can.GetPrimitive("gData").GetN()):
+  diffRebin = 0
+  obsRebin = 0
+  predRebin = 0
+  iRebin = 0
+  chiSquareRebin = 0
+  #for iPt in range(0, can.GetPrimitive("gData").GetN()):
+  for iPt in range(0, 2700):
     can.GetPrimitive("gData").GetPoint(iPt, invMass, obs)
     intVar.setRange("range", invMass-0.5, invMass+0.5)
     pred = pdfs[pdf].createIntegral(argset, RooFit.NormSet(argset), RooFit.Range("range")).getVal()*nEventsData
     pdfHists[-1].Fill(invMass, pred)
     if options.chiSquare:
       diff = obs - pred  
-      print "invMass %i, obs=%f, prediction=%f, diff=%f" % (invMass, obs, pred, diff)
-      chiSquare+=((obs-pred)*(obs-pred))/pred
+      obsRebin += obs
+      predRebin += pred
+      iRebin += 1
+      #print "pdf %s: invMass %i, obs=%f, prediction=%f, diff=%f" % (pdfs[pdf].GetName(), invMass, obs, pred, diff)
+      if obs>0:
+        chiSquare+=((obs-pred)*(obs-pred))/can.GetPrimitive("gData").GetErrorY(iPt)
+      if iRebin == 30: 
+        diffRebin = obs-pred
+        print "pdf %s: invMass %i, obs=%f, prediction=%f, diff=%f, diff^2=%f, pChi2=%f" % (pdfs[pdf].GetName(), invMass, obs, pred, diffRebin, diffRebin*diffRebin, diffRebin*diffRebin/pred)
+        diffRebin=0
+        iRebin=0
+        chiSquareRebin += (obs-pred)*(obs-pred)/pred
   if options.chiSquare:
-    chiSquareLog.write("model %s: chi^2 = %f (manual method)\n\n" % (pdfs[pdf].GetName(),  chiSquare))
+    chiSquareLog.write("model %s: chi^2 = %f (manual method), chi2rebin = %f\n\n" % (pdfs[pdf].GetName(), chiSquare, chiSquareRebin))
   iBlue += 1
 if options.chiSquare:
   chiSquareLog.close()
