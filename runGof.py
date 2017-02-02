@@ -5,6 +5,7 @@ from glob import glob
 import shlex
 from modelNames import getModelNames
 from condorFactory import *
+from forcelink import force_symlink
 
 ####
 # prepares a bunch of scripts and jdl files
@@ -47,11 +48,16 @@ def makeDatacards(category, inFile, outDir, fit):
   if not path.exists(outDir):
       makedirs(outDir)
   dcardTemplate = open("datacard_template_%s.txt" % category, "r")
+  
+  if not path.exists(path.join(outDir, "w_data_%s.root" % category)):
+    force_symlink(path.join("..", "w_data_%s.root" % category), path.join(outDir, "w_data_%s.root" % category))
+  if not path.exists(path.join(outDir, "w_signal_780.root")):
+    force_symlink(path.join("..", "..", "Vg", "signalFits_%s" % category, "w_signal_780.root"), path.join(outDir, "w_signal_780.root"))
 
   if fit:
     doFit(category, inFile)
-
-  makeOneDatacard(bkgFileName, dcardTemplate, category, modelName, outDir)
+  for modelName in getModelNames(): 
+    makeOneDatacard("cat-%s_model-%s.root" % (category, modelName), dcardTemplate, category, modelName, outDir)
 
 def checkForDatacard(outDir, dcardName):
   txtFiles = glob("%s/*.txt" % outDir)
@@ -78,6 +84,8 @@ def makeGOFscripts(category, method, nToys, seed, outDir):
     chmod(script.name, 0o777)
     jdl    = open(jdlName, "w")
     jdl.write(simpleJdl(script.name.replace("%s/" % outDir,"")))
+    if not path.exists(path.join(outDir, "condorLogs")):
+      makedirs(path.join(outDir, "condorLogs"))
 
 if __name__ == "__main__":
   parser = OptionParser()
@@ -100,7 +108,7 @@ if __name__ == "__main__":
   (options, args) = parser.parse_args()
   
 
-  outDir = "gofCondor"
+  outDir = "gof_%s_%s" % (options.doGOFtest, options.category)
   if options.category is None:
     parser.error("please specify 'btag' or 'antibtag' as the -c option")
   if not options.doGOFtest in [None, "saturated", "KS"]:

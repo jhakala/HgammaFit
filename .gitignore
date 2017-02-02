@@ -1,5 +1,7 @@
 *.pyc
 *.root
 *.pdf
-forcelink.py
-condor/*
+mlfitCondor*
+gof_*
+chisquareLog*
+garbage
