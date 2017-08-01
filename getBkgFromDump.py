@@ -1,6 +1,5 @@
 from optparse import OptionParser
 from forcelink import force_symlink
-from ROOT import *
 
 ####
 # Script for getting a background prediction pdf from the the dump made by dumpBkgPdfs
@@ -146,6 +145,7 @@ if __name__ == "__main__" :
     exit("something went wrong with the categories! \n%s" %
          ("... you picked '%s' but it has to be 'antibtag' or 'btag'" % options.category)
         )
+  from ROOT import *
   if options.batch:
     gROOT.SetBatch()
   
@@ -176,7 +176,7 @@ if __name__ == "__main__" :
   
   
   print "about to get background model:"
-  backgroundDict     = getPdfFromDump(category, dump, pdfNames[int(pdfIndex)], options.makePlot, dataRooHist, options.outSuffix, options.batch)
+  backgroundDict     = getPdfFromDump(options.category, dump, pdfNames[int(pdfIndex)], options.makePlot, dataRooHist, options.outSuffix, options.batch)
   bkgPdfFromDump = backgroundDict["pdfFromDump"]
   backgroundWS       = backgroundDict["rooWS"]
   outFileName        = "%s_%s_%s.root" % (backgroundDict["origName"], options.outSuffix, options.category)
