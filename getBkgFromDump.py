@@ -12,6 +12,7 @@ from forcelink import force_symlink
 ####
 
 
+from ROOT import *
 def getPdfFromDump(category, inWorkspace, pdfName, makePlot, rooHistData, outSuffix, batch) :
   if batch:
     gROOT.SetBatch()

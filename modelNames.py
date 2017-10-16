@@ -41,6 +41,14 @@ def getGoodModelNames(category):
       "bkg_dijetsimple2",
       "bkg_exp1",
       "bkg_expow1",
+      # FOR TESTING
+      #"bkg_exp2",
+      "bkg_exp3",
+      "bkg_pow1",
+      #"bkg_pow2",
+      "bkg_pow3",
+      "bkg_expow2",
+      "bkg_expow3",
       #"bkg_lau1",
       "bkg_vvdijet1"
     ]

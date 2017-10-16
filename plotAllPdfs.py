@@ -30,9 +30,12 @@ gSystem.Load("libHiggsAnalysisCombinedLimit")
 
 pdfs={}
 for inFile in inFiles:
+  print "working on inFile: ", inFile.GetName()
   pdfName = inFile.GetName().replace("gof_saturated_%s/cat-%s_model-" % (options.category, options.category),"").replace(".root","")
   pdfs[inFile.GetName()] = inFile.Get("Vg").pdf(pdfName)
   pdfs[inFile.GetName()].Print()
+  if not "RooAddPdf" in pdfs[inFile.GetName()].IsA().GetName():
+    print pdfs[inFile.GetName()].dumpFormula()
 
 print pdfs
 xVar = inFiles[0].Get("Vg").var("x")
