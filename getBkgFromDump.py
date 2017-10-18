@@ -12,6 +12,7 @@ from forcelink import force_symlink
 ####
 
 
+from ROOT import *
 def getPdfFromDump(category, inWorkspace, pdfName, makePlot, rooHistData, outSuffix, batch) :
   if batch:
     gROOT.SetBatch()
@@ -31,6 +32,8 @@ def getPdfFromDump(category, inWorkspace, pdfName, makePlot, rooHistData, outSuf
   varIt    = varset.iterator()
   paramVar = varIt.Next()
   var = inWorkspace.var("x")
+  # HACK HACK
+  #var.setRange("x", 800, 4800)
 
   while paramVar:
     print "looking at paramVar %s" % paramVar.GetName()
@@ -45,6 +48,7 @@ def getPdfFromDump(category, inWorkspace, pdfName, makePlot, rooHistData, outSuf
   #result = pdfFromDump.fitTo(rooHistData, RooFit.Minimizer("Minuit2"),RooFit.SumW2Error(kTRUE), RooFit.Strategy(2), RooFit.Hesse(0), RooFit.Save(kTRUE) )
   #result = pdfFromDump.fitTo(rooHistData, RooFit.Minimizer("Minuit2"),RooFit.SumW2Error(kTRUE), RooFit.Save())
   
+  print("D")
   status = 1
   result = RooFitResult()
   nll = RooNLLVar("nll", "nll", pdfFromDump, rooHistData)
@@ -53,6 +57,7 @@ def getPdfFromDump(category, inWorkspace, pdfName, makePlot, rooHistData, outSuf
   minuit.setStrategy(2)
   minuit.minimize("Minuit2", "minimize")
   nTries = 0
+  print("E")
   def doFit(refs):
     maxTries = 10+refs["tries"]
     while stat != 0 :
@@ -145,7 +150,6 @@ if __name__ == "__main__" :
     exit("something went wrong with the categories! \n%s" %
          ("... you picked '%s' but it has to be 'antibtag' or 'btag'" % options.category)
         )
-  from ROOT import *
   if options.batch:
     gROOT.SetBatch()
   

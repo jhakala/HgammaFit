@@ -8,7 +8,7 @@ for lib in extLibs:
   gSystem.Load(lib)
 pdfFactory = PdfModelBuilder()
 
-xVar = RooRealVar("x", "x", 700, 4700)
+xVar = RooRealVar("x", "x", 800, 4800)
 xVar.setBins(4000)
 
 pdfFactory.setObsVar(xVar)
