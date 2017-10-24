@@ -1,4 +1,4 @@
-def getModelNames():
+def getModelNames(category="blah"):
   return [
     "bkg_dijetsimple2",
     "bkg_dijet2",
@@ -29,18 +29,34 @@ def getGoodModelNames(category):
   elif category == "btag":
     return [
       "bkg_dijetsimple2",
+      "bkg_dijet2",
       "bkg_atlas1",
-      "bkg_expow1",
-      "bkg_exp1",
+      #"bkg_atlas2",
+      #"bkg_expow1",
+      "bkg_expow3",
+      #"bkg_pow1",
+      #"bkg_pow2",
+      #"bkg_exp1",
+      #"bkg_exp3",
+      #"bkg_exp2",
       #"bkg_lau1",
       "bkg_vvdijet1"
+      #"bkg_vvdijet2"
     ]
   elif category == "antibtag":
     return [
-      "bkg_atlas1",
       "bkg_dijetsimple2",
-      "bkg_exp1",
-      "bkg_expow1",
+      "bkg_dijet2",
+      "bkg_atlas1",
+      #"bkg_atlas2",
+      #"bkg_expow1",
+      "bkg_expow3",
+      #"bkg_pow1",
+      #"bkg_pow2",
+      #"bkg_exp1",
+      #"bkg_exp2",
+      #"bkg_exp3",
       #"bkg_lau1",
       "bkg_vvdijet1"
+      #"bkg_vvdijet2"
     ]

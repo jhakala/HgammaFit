@@ -12,6 +12,7 @@ from forcelink import force_symlink
 ####
 
 
+from ROOT import *
 def getPdfFromDump(category, inWorkspace, pdfName, makePlot, rooHistData, outSuffix, batch) :
   if batch:
     gROOT.SetBatch()
@@ -145,7 +146,6 @@ if __name__ == "__main__" :
     exit("something went wrong with the categories! \n%s" %
          ("... you picked '%s' but it has to be 'antibtag' or 'btag'" % options.category)
         )
-  from ROOT import *
   if options.batch:
     gROOT.SetBatch()
   

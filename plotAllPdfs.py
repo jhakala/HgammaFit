@@ -1,5 +1,6 @@
 from optparse import OptionParser
 from modelNames import getGoodModelNames
+#from modelNames import getModelNames
 
 parser = OptionParser()
 parser.add_option("-c", "--category" , dest="category" , 
@@ -77,25 +78,25 @@ for pdf in pdfs.keys():
     intVar.setRange("range", invMass-0.5, invMass+0.5)
     pred = pdfs[pdf].createIntegral(argset, RooFit.NormSet(argset), RooFit.Range("range")).getVal()*nEventsData
     pdfHists[-1].Fill(invMass, pred)
-    if options.chiSquare:
-      diff = obs - pred  
-      obsRebin += obs
-      predRebin += pred
-      iRebin += 1
-      #print "pdf %s: invMass %i, obs=%f, prediction=%f, diff=%f" % (pdfs[pdf].GetName(), invMass, obs, pred, diff)
-      if obs>0:
-        chiSquare+=((obs-pred)*(obs-pred))/can.GetPrimitive("gData").GetErrorY(iPt)
-      if iRebin == 30: 
-        diffRebin = obs-pred
-        print "pdf %s: invMass %i, obs=%f, prediction=%f, diff=%f, diff^2=%f, pChi2=%f" % (pdfs[pdf].GetName(), invMass, obs, pred, diffRebin, diffRebin*diffRebin, diffRebin*diffRebin/pred)
-        diffRebin=0
-        iRebin=0
+    diff = obs - pred  
+    obsRebin += obs
+    predRebin += pred
+    iRebin += 1
+    #print "pdf %s: invMass %i, obs=%f, prediction=%f, diff=%f" % (pdfs[pdf].GetName(), invMass, obs, pred, diff)
+    if obs>0 and options.chiSquare:
+      chiSquare+=((obs-pred)*(obs-pred))/can.GetPrimitive("gData").GetErrorY(iPt)
+    if iRebin == 30: 
+      diffRebin = obs-pred
+      print "pdf %s: invMass %i, obs=%f, prediction=%f, diff=%f, diff^2=%f, pChi2=%f" % (pdfs[pdf].GetName(), invMass, obs, pred, diffRebin, diffRebin*diffRebin, diffRebin*diffRebin/pred)
+      diffRebin=0
+      iRebin=0
+      if options.chiSquare:
         chiSquareRebin += (obs-pred)*(obs-pred)/pred
-  if options.chiSquare:
-    chiSquareLog.write("model %s: chi^2 = %f (manual method), chi2rebin = %f\n\n" % (pdfs[pdf].GetName(), chiSquare, chiSquareRebin))
+    if options.chiSquare:
+      chiSquareLog.write("model %s: chi^2 = %f (manual method), chi2rebin = %f\n\n" % (pdfs[pdf].GetName(), chiSquare, chiSquareRebin))
   iBlue += 1
-if options.chiSquare:
-  chiSquareLog.close()
+  if options.chiSquare:
+    chiSquareLog.close()
 
 frame.Draw()
 
@@ -142,7 +143,7 @@ if options.rebin is not None:
 
   curves = []
   iColor = 0
-  colors = [kGreen, kGreen+1, kGreen+2, kBlack, kBlue, kBlue+1, kCyan+3, kCyan+2, kCyan+1, kMagenta+3, kMagenta+2, kMagenta+1, kRed, kRed+1, kOrange, kOrange+1 ]
+  colors = [kGreen, kGreen+1, kGreen+2, kBlack, kBlue, kBlue+1, kCyan+3, kCyan+2, kCyan+1, kMagenta+3, kMagenta+2, kMagenta+1, kRed, kRed+1, kOrange, kOrange+1, kRed-2, kRed, kRed+2, kViolet-2, kViolet, kViolet+2]
   #widths = [7, 5, 3, 3, 3]
   for prim in can.GetListOfPrimitives():
     if "RooCurve" in prim.IsA().GetName():
