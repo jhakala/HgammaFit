@@ -57,7 +57,7 @@ if options.chiSquare:
 pdfHists = []
 for pdf in pdfs.keys():
   pdfs[pdf].plotOn(frame, RooFit.LineColor(kBlue + iBlue))
-  pdfHists.append(TH1F("hist_%s" % pdfs[pdf].GetName(), pdfs[pdf].GetName(), 4000, 800, 4800))
+  pdfHists.append(TH1F("hist_%s" % pdfs[pdf].GetName(), pdfs[pdf].GetName(), 4000, 700, 4700))
   if options.chiSquare:
     invMass = Double(0)
     obs = Double(0)
@@ -104,7 +104,7 @@ can.SaveAs("allPdfs.root")
 
 if options.rebin is not None:
   rebinCan = TPad("dataFit_%s" % cat, "%s: fits" % cat, 0, 0.3, 1, 1.0)
-  hist = TH1F("rebinned_fit", "Fits (rebinned)", 4000, 800, 4800)
+  hist = TH1F("rebinned_fit", "Fits (rebinned)", 4000, 700, 4700)
   x = Double()
   y = Double()
   maxY = Double(0)

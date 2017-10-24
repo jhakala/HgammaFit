@@ -8,7 +8,7 @@ for lib in extLibs:
   gSystem.Load(lib)
 pdfFactory = PdfModelBuilder()
 
-xVar = RooRealVar("x", "x", 800, 4800)
+xVar = RooRealVar("x", "x", 700, 4700)
 xVar.setBins(4000)
 
 pdfFactory.setObsVar(xVar)
@@ -46,9 +46,16 @@ if printInfo:
   print "\n\n\n"
   print "-------  Info about the Vgamma background pdfs -------"
   xVar.Print()
+  info = {}
   for pdf in pdfs:
+    print "------------"
+    print "this pdf has name %s" % pdf.GetName()
     pdf.Print()
-    print " --> this object has name %s" % pdf.GetName()
+    #if "dumpFormula" in dir(pdf):
+      #pdf.dumpFormula()
+    #else: 
+      #print "no dumpFormula() available for this pdf"
+    #print " --> this pdf has things named", dir(pdf)
   print "------------------------------------------------------"
 
 outWorkspace = RooWorkspace("Vg")
