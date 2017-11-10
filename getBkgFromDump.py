@@ -92,6 +92,7 @@ def getPdfFromDump(category, inWorkspace, pdfName, makePlot, rooHistData, outSuf
     else:
       print "fit failed after %i tries"  % nTries
       exit(0)
+  
     
   
   
@@ -108,6 +109,7 @@ def getPdfFromDump(category, inWorkspace, pdfName, makePlot, rooHistData, outSuf
   getattr(rooWS, 'import')(pdfFromDump, RooCmdArg())
   getattr(rooWS, 'import')(rooHistData, RooCmdArg())
   getattr(rooWS, 'import')(nBackground, RooCmdArg())
+  minuit.minos(RooArgSet(RooArgList(rooWS.var("bkg_dijetsimple2_lin2"), rooWS.var("bkg_dijetsimple2_log2"))))
   return {"rooWS" : rooWS, "pdfFromDump": pdfFromDump, "origName" : origName}
 
 if __name__ == "__main__" :
