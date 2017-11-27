@@ -42,7 +42,9 @@ for method in methods:
     gofTable = open("gofTable_%s_%s.txt" % (method, category), "w")
     gofTable.write("{:<15} & {:<7} & {:<20} & {:<20} & {:<20}\\\\ \n".format("Model", "Order", "Lower Bound", "Test Statistic", "Upper Bound"))
     gofTable.write("\\hline\n")
-    for modelName in gofMap:
+    #for modelName in gofMap:
+    #from operator import itemgetter
+    for modelName in sorted(gofMap, key=lambda x:gofMap[x]['testStatistic']): 
       modelTitle =re.split('(\d+)', modelName)[0]
       order =re.split('(\d+)', modelName)[1]
       gofTable.write("{:<15} & {:<7} & {:<20} & {:<20} & {:<20}\\\\ \n".format(modelTitle, order, gofMap[modelName]["lowerBound"], gofMap[modelName]["testStatistic"], gofMap[modelName]["upperBound"]))

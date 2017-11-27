@@ -3,7 +3,7 @@ import subprocess as sp
 from optparse import OptionParser
 from glob import glob
 import shlex
-from modelNames import getModelNames
+from modelNames import getModelNames, getGoodModelNames
 from condorFactory import *
 from forcelink import force_symlink
 
@@ -28,7 +28,7 @@ def makeOneDatacard(inFile, dcardTemplate, category, modelName, outDir):
   print "  > made datacard for model %s: %s" % (modelName, outDcard.name)
 
 def doFit(category, inFile):
-  for modelName in getModelNames():
+  for modelName in getGoodModelNames(category):
     bkgFileName = "cat-%s_model-%s.root" % (category, modelName)
     dataLinkName = "w_data_%s.root" % options.category
     dataFile = TFile(dataLinkName)
@@ -56,7 +56,7 @@ def makeDatacards(category, inFile, outDir, fit):
 
   if fit:
     doFit(category, inFile)
-  for modelName in getModelNames(): 
+  for modelName in getGoodModelNames(category): 
     makeOneDatacard("cat-%s_model-%s.root" % (category, modelName), dcardTemplate, category, modelName, outDir)
 
 def checkForDatacard(outDir, dcardName):
@@ -66,7 +66,7 @@ def checkForDatacard(outDir, dcardName):
     exit(1)
 
 def makeGOFscripts(category, method, nToys, seed, outDir):
-  for modelName in getModelNames(): 
+  for modelName in getGoodModelNames(category): 
     dcardName = getDcardName(category, modelName, outDir)
     checkForDatacard(outDir, dcardName)
     print "Will prepare gofCondor scripts to run GOF test with datacard %s using method %s" % (dcardName, method)

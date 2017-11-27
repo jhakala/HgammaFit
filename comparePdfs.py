@@ -135,7 +135,7 @@ if options.rebin is not None:
   hist.SetMarkerStyle(20)
   hist.SetLineColor(kBlack)
   hist.GetYaxis().SetRangeUser(0.2, maxY*float(options.rebin)*1.2)
-  hist.GetXaxis().SetRangeUser(675, maxX*1.1)
+  hist.GetXaxis().SetRangeUser(675, 2500)
   hist.GetXaxis().SetTitle("m_{j#gamma} (GeV)")
   hist.Draw("PE1")
   hist.SetTitle("%s category: fits" % cat)
@@ -167,22 +167,28 @@ if options.rebin is not None:
   rebinCan.SetLogy()
   #rebinCan.SaveAs("rebinnedPdfs_%s.root" % cat)
   #ratioCan = TCanvas()
-  ratioCan = TPad("ratioPad_%s" % cat, "%s: Data/Fit" % cat, 0, 0.05, 1, 0.3) 
-  ratioCan.cd()
+  diffCan = TPad("diffPad_%s" % cat, "%s: (Fit_{alt}-Fit_{nom})/Fit_{nom}" % cat, 0, 0.05, 1, 0.3) 
+  diffCan.cd()
   first = True
   histClones = []
-  for i in range(0, len(pdfHists)):
-    histClones.append(hist.Clone())
-    histClones[-1].SetName("pdfHist_%i" % i)
-    histClones[-1].Sumw2()
-    histClones[-1].Divide(pdfHists[i])
+  otherFits = []
+  for pdfHist in pdfHists:
+    if "dijetsimple2" in pdfHist.GetName():
+      nominalFit = pdfHist
+    else:
+      otherFits.append(pdfHist)
+  for i in range(0, len(otherFits)):
+    histClones.append(otherFits[i].Clone())
+    histClones[-1].Add(nominalFit, -1)
+    histClones[-1].Divide(nominalFit)
     histClones[-1].SetMarkerColor(colors[i])
+    histClones[-1].SetMarkerStyle(7)
     histClones[-1].SetMarkerSize(0.5)
     histClones[-1].SetLineColor(colors[i])
-    histClones[-1].GetYaxis().SetRangeUser(0,2)
-    histClones[-1].GetYaxis().SetRangeUser(0,2)
-    histClones[-1].GetYaxis().SetTitle("data/fit")
+    histClones[-1].GetYaxis().SetRangeUser(-0.2,0.2)
+    histClones[-1].GetYaxis().SetTitle("(Fit_{alt}-Fit_{nom})/Fit_{nom}")
     histClones[-1].GetYaxis().SetTitleOffset(0.3)
+    histClones[-1].GetXaxis().SetRangeUser(675, 2500)
     histClones[-1].GetYaxis().SetTitleSize(.12)
     histClones[-1].SetStats(kFALSE)
     histClones[-1].GetXaxis().SetLabelSize(0.10)
@@ -192,16 +198,17 @@ if options.rebin is not None:
       histClones[-1].GetYaxis().SetLabelSize(0.1)
       histClones[-1].GetYaxis().SetNdivisions(405)
       histClones[-1].SetTitle("")
-      histClones[-1].Draw("PE1")
+      histClones[-1].Draw("hist p")
       first = False
     else:
-      histClones[-1].Draw("SAME PE1")
+      histClones[-1].Draw("SAME hist p")
     i+=1
   #ratioCan.SaveAs("ratios_%s.root" % cat)
     
   masterCan.cd()
-  ratioCan.Draw()
-  masterCan.SaveAs("rebinnedPdfs_%s.root" % cat)
+  diffCan.Draw()
+  masterCan.SaveAs("comparePdfs_%s.root" % cat)
+  masterCan.Print("comparePdfs_%s.pdf" % cat) 
      
 
 if options.chiSquare:

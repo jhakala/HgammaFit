@@ -32,6 +32,7 @@ def getPdfFromDump(category, inWorkspace, pdfName, makePlot, rooHistData, outSuf
   varIt    = varset.iterator()
   paramVar = varIt.Next()
   var = inWorkspace.var("x")
+  var.setRange("hackRange", 725., 3000.)
 
   while paramVar:
     print "looking at paramVar %s" % paramVar.GetName()
@@ -48,11 +49,14 @@ def getPdfFromDump(category, inWorkspace, pdfName, makePlot, rooHistData, outSuf
   
   status = 1
   result = RooFitResult()
-  nll = RooNLLVar("nll", "nll", pdfFromDump, rooHistData)
+  #nll = RooNLLVar("nll", "nll", pdfFromDump, rooHistData)
+  nll = RooNLLVar("nll", "nll", pdfFromDump, rooHistData, RooFit.Range("hackRange") )
   minuit = RooMinimizer(nll)
   minuit.setOffsetting(kTRUE)
   minuit.setStrategy(2)
-  minuit.minimize("Minuit2", "minimize")
+  minuit.setEps(0.0001)
+  minuit.minimize("Minuit", "minimize")
+  #minuit.minimize("GSL")
   nTries = 0
   def doFit(refs):
     maxTries = 10+refs["tries"]
@@ -66,7 +70,17 @@ def getPdfFromDump(category, inWorkspace, pdfName, makePlot, rooHistData, outSuf
       refs["tries"] += 1
       if refs["tries"] == maxTries or refs["stat"] == 0:
         break
+        # if refs["stat"] == 0 and not refs["passedOnce"]:
+        #   refs["passedOnce"] = True
+        #   print "found minimum, will run improve"
+        #   refs["stat"]=-1
+        #   #for i in range(0, 5):
+        #   #  minuit.improve()
+        #   #  print "just ran improve, going to re-minimize"
+        # else:
+        #   break
   references = {}
+  references["passedOnce"] = False
   references["negLogLikelihood"]   = nll
   references["fitTest"]           = result
   references["stat"]              = int(status)
@@ -82,7 +96,7 @@ def getPdfFromDump(category, inWorkspace, pdfName, makePlot, rooHistData, outSuf
       print "looking at paramVar %s" % paramVar.GetName()
       if paramVar.GetName() != var.GetName(): # only print the actual shape variables
         print "parameter with name %s had final value %f" % (paramVar.GetName(), paramVar.getValV())
-        paramVar.setConstant(kTRUE)
+        paramVar.setConstant(kFALSE)
       paramVar = varIt.Next()
       
   else:
@@ -92,23 +106,37 @@ def getPdfFromDump(category, inWorkspace, pdfName, makePlot, rooHistData, outSuf
     else:
       print "fit failed after %i tries"  % nTries
       exit(0)
-    
-  
-  
+  #references["fitTest"].Print()
   var = inWorkspace.var("x")
   frame = var.frame()
 
   rooHistData.plotOn(frame)
+  ### HERE: for error bands on background fit
+  #pdfFromDump.plotOn(frame, RooFit.VisualizeError(references["fitTest"], 2, kTRUE), RooFit.FillColor(kOrange))
+  #pdfFromDump.plotOn(frame, RooFit.VisualizeError(references["fitTest"], 1.05, kTRUE), RooFit.FillColor(kGreen+2))
   pdfFromDump.plotOn(frame)
   can = TCanvas()
   can.cd()
   frame.Draw()
+  
+  #contourPlot = minuit.contour(inWorkspace.var("bkg_dijetsimple2_lin2"), inWorkspace.var("bkg_dijetsimple2_lin2"),  2.3/float(2) )
+  #raw_input("Press Enter to continue...")
   if makePlot:
     can.Print("fitFromFtest_%s_%s_%s.pdf" % (category, origName, outSuffix))
   getattr(rooWS, 'import')(pdfFromDump, RooCmdArg())
   getattr(rooWS, 'import')(rooHistData, RooCmdArg())
   getattr(rooWS, 'import')(nBackground, RooCmdArg())
+
+  fitResultFile = TFile("fitRes_%s.root" % category, "RECREATE")
+  fitResultFile.cd()
+  rooWS.Write()
+  references["fitTest"].Write()
+  can.Write()
+  fitResultFile.Close()
+
   return {"rooWS" : rooWS, "pdfFromDump": pdfFromDump, "origName" : origName}
+  
+  
 
 if __name__ == "__main__" :
 
