@@ -32,7 +32,7 @@ def getPdfFromDump(category, inWorkspace, pdfName, makePlot, rooHistData, outSuf
   varIt    = varset.iterator()
   paramVar = varIt.Next()
   var = inWorkspace.var("x")
-  var.setRange("hackRange", 725., 3000.)
+  #var.setRange("hackRange", 725., 3000.)
 
   while paramVar:
     print "looking at paramVar %s" % paramVar.GetName()
@@ -49,8 +49,8 @@ def getPdfFromDump(category, inWorkspace, pdfName, makePlot, rooHistData, outSuf
   
   status = 1
   result = RooFitResult()
-  #nll = RooNLLVar("nll", "nll", pdfFromDump, rooHistData)
-  nll = RooNLLVar("nll", "nll", pdfFromDump, rooHistData, RooFit.Range("hackRange") )
+  nll = RooNLLVar("nll", "nll", pdfFromDump, rooHistData)
+  #nll = RooNLLVar("nll", "nll", pdfFromDump, rooHistData, RooFit.Range("hackRange") )
   minuit = RooMinimizer(nll)
   minuit.setOffsetting(kTRUE)
   minuit.setStrategy(2)

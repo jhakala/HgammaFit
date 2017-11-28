@@ -85,7 +85,7 @@ for pdf in pdfs.keys():
     #print "pdf %s: invMass %i, obs=%f, prediction=%f, diff=%f" % (pdfs[pdf].GetName(), invMass, obs, pred, diff)
     if obs>0 and options.chiSquare:
       chiSquare+=((obs-pred)*(obs-pred))/can.GetPrimitive("gData").GetErrorY(iPt)
-    if iRebin == 30: 
+    if iRebin == 50: 
       diffRebin = obs-pred
       print "pdf %s: invMass %i, obs=%f, prediction=%f, diff=%f, diff^2=%f, pChi2=%f" % (pdfs[pdf].GetName(), invMass, obs, pred, diffRebin, diffRebin*diffRebin, diffRebin*diffRebin/pred)
       diffRebin=0
