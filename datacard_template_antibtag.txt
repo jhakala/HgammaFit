@@ -14,11 +14,12 @@ bin                   Vg          Vg
 process               signal      background
 process               0           1
 rate                  2.94084 1
-cms_lumi_13TeV  lnN   1.027       -     
-cms_btag_sf_13TeV       lnN              1.174         -
+cms_lumi_13TeV  lnN   1.025       -     
+cms_btag_sf_13TeV       lnN              0.96154         -
 cms_JES_13TeV           lnN              1.02        -         
 cms_phoHLT_13TeV        lnN              1.02        -         
-cms_pho_sf_13TeV        lnN              1.05        -         
+cms_pho_sf_13TeV        lnN              1.01        -         
+cms_pho_eff_13TeV       lnN              1.04        -         
 cms_pileup_13TeV        lnN              1.01        -         
 cms_xzg_pdf_13TeV       lnN              1.02        -         
 cms_xzg_scale_13TeV     lnN              1.05        -        

@@ -53,7 +53,7 @@ def getPdfFromDump(category, inWorkspace, pdfName, makePlot, rooHistData, outSuf
   #nll = RooNLLVar("nll", "nll", pdfFromDump, rooHistData, RooFit.Range("hackRange") )
   minuit = RooMinimizer(nll)
   minuit.setOffsetting(kTRUE)
-  minuit.setStrategy(2)
+  minuit.setStrategy(1)
   minuit.setEps(0.0001)
   minuit.minimize("Minuit", "minimize")
   #minuit.minimize("GSL")
@@ -112,8 +112,8 @@ def getPdfFromDump(category, inWorkspace, pdfName, makePlot, rooHistData, outSuf
 
   rooHistData.plotOn(frame)
   ### HERE: for error bands on background fit
-  #pdfFromDump.plotOn(frame, RooFit.VisualizeError(references["fitTest"], 2, kTRUE), RooFit.FillColor(kOrange))
-  #pdfFromDump.plotOn(frame, RooFit.VisualizeError(references["fitTest"], 1.05, kTRUE), RooFit.FillColor(kGreen+2))
+  pdfFromDump.plotOn(frame, RooFit.VisualizeError(references["fitTest"], 2, kFALSE), RooFit.FillColor(kOrange))
+  pdfFromDump.plotOn(frame, RooFit.VisualizeError(references["fitTest"], 1, kFALSE), RooFit.FillColor(kGreen+2))
   pdfFromDump.plotOn(frame)
   can = TCanvas()
   can.cd()
