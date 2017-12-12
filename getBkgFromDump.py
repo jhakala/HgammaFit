@@ -53,20 +53,22 @@ def getPdfFromDump(category, inWorkspace, pdfName, makePlot, rooHistData, outSuf
   #nll = RooNLLVar("nll", "nll", pdfFromDump, rooHistData, RooFit.Range("hackRange") )
   minuit = RooMinimizer(nll)
   minuit.setOffsetting(kTRUE)
-  minuit.setStrategy(1)
+  minuit.setStrategy(2)
   minuit.setEps(0.0001)
-  minuit.minimize("Minuit", "minimize")
   #minuit.minimize("GSL")
   nTries = 0
+  rand = TRandom()
   def doFit(refs):
+
     maxTries = 10+refs["tries"]
     while stat != 0 :
+      minuit.minimize("Minuit", "minimize")
       refs["fitTest"] =  refs["minimizer"].save("fitTest", "fitTest")
       offset = refs["negLogLikelihood"].offset()
       minnll_woffset = refs["fitTest"].minNll()
       minnll = -offset-minnll_woffset
       refs["stat"] = refs["fitTest"].status()
-      print "try %i:\n status: %i  minnll_woffset: %f, minnll: %f, offset: %f" % (refs["fitTest"].status(), refs["tries"], minnll_woffset, minnll, offset)
+      print "try %i:\n status: %i  minnll_woffset: %f, minnll: %f, offset: %f" % (refs["tries"], refs["fitTest"].status(), minnll_woffset, minnll, offset)
       refs["tries"] += 1
       if refs["tries"] == maxTries or refs["stat"] == 0:
         break
@@ -100,12 +102,20 @@ def getPdfFromDump(category, inWorkspace, pdfName, makePlot, rooHistData, outSuf
       paramVar = varIt.Next()
       
   else:
-    if nTries < 100:
+    while references["stat"] != 0:
       references["fitTest"].randomizePars() # try to get out of the danga zone
+      varIt.Reset()
+      paramVar = varIt.Next()
+      while paramVar:
+        print "resetting %s's value"%paramVar.GetName()
+        paramVar.setVal((rand.Rndm()-0.5)*10**(rand.Rndm()))
+        paramVar = varIt.Next()
+      print "retrying fit"
       doFit(references) # TODO: test
-    else:
-      print "fit failed after %i tries"  % nTries
-      exit(0)
+      if references["tries"] == 10000:
+        print "fit failed after %i tries"  % references["tries"]
+        exit(0)
+        
   #references["fitTest"].Print()
   var = inWorkspace.var("x")
   frame = var.frame()

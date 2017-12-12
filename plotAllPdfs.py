@@ -143,7 +143,7 @@ if options.rebin is not None:
 
   curves = []
   iColor = 0
-  colors = [kBlue, kBlue+1, kGreen, kGreen+1, kGreen+2, kBlack,  kCyan+3, kCyan+2, kCyan+1, kMagenta+3, kMagenta+2, kMagenta+1, kRed, kRed+1, kOrange, kOrange+1, kRed-2, kRed, kRed+2, kViolet-2, kViolet, kViolet+2]
+  colors = [kBlack, kGreen+2, kCyan+3, kBlue, kViolet, kRed+1, kOrange+2, kRed-8, kBlue,  kCyan+3, kCyan+2, kCyan+1, kMagenta+3, kMagenta+2, kMagenta+1, kRed, kRed+1, kOrange, kOrange+1, kRed-2, kRed, kRed+2, kViolet-2, kViolet, kViolet+2]
   #widths = [7, 5, 3, 3, 3]
   for prim in can.GetListOfPrimitives():
     if "RooCurve" in prim.IsA().GetName():

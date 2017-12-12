@@ -77,6 +77,10 @@ def makeGOFscripts(category, method, nToys, seed, outDir):
       method
     )
     pName = "cat-%s_meth-%s_model-%s_nToys-%i_seed-%i"%(category, method, modelName, nToys, seed)
+    if options.useToysFile:
+      toysFileName = "../Vg/toys_%s/higgsCombineBiasTest_%s_%s.GenerateOnly.mH1337.246802.root" % (category, category, modelName) # HERE make sure this is the right file
+      incantation += " --toysFile=%s" % toysFileName
+      pName += "_vgToys"
     scriptName = "%s/gof_%s.sh" % (outDir, pName)
     jdlName =    "%s/jdl_%s.jdl" % (outDir, pName)
     script = open(scriptName, "w")
@@ -103,12 +107,16 @@ if __name__ == "__main__":
                     help  = "the number of toys to use in the GOF test. [default=25]"             )
   parser.add_option("-f", action="store_true",  dest="fit",
                     help = "toggle fitting the backgrounds [default=False]", default=False        )
+  parser.add_option("-v", action="store_true",  dest="useToysFile",
+                    help = "use toys file from Vg bias studies [default=False]", default=False    )
   parser.add_option("-s", "--seed"      ,       dest="seed",    type="int",
                     help  = "the random number seed to use in the GOF test. [default=501337]"     )
   (options, args) = parser.parse_args()
   
 
   outDir = "gof_%s_%s" % (options.doGOFtest, options.category)
+  if options.useToysFile:
+    outDir += "_vgToys"
   if options.category is None:
     parser.error("please specify 'btag' or 'antibtag' as the -c option")
   if not options.doGOFtest in [None, "saturated", "KS"]:

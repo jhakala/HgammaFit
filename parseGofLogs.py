@@ -9,7 +9,7 @@ for method in methods:
   for category in categories:
     gofMap = {}
     inDir = "gof_%s_%s" % (method, category)
-    gofLogNames = glob("%s/condorLogs/*.stdout" % inDir)
+    gofLogNames = glob("%s/condorLogs/*543210.sh.stdout" % inDir)
     if debug:
       print gofLogNames
     for gofLogName in gofLogNames:
